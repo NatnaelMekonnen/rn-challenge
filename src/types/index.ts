@@ -1,8 +1,8 @@
-interface IFields {
+export interface IFields {
   label: string;
   type: string;
   readOnly: boolean;
-  calculate: string;
+  calculate: string | null;
 }
 
 export interface IModel {

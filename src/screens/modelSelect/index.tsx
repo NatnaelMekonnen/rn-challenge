@@ -13,6 +13,9 @@ const ModelSelectionScreen = (): JSX.Element => {
     fields: {},
   });
 
+ /**
+  * This function sets the selected model and navigates to the "modelDisplay" screen.
+  */
   const handleSelectModel = () => {
     setModel(selectedModel);
     //@ts-ignore

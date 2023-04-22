@@ -4,20 +4,28 @@ import { ModelContext } from "../../core/ModelProvider";
 import { ScrollView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as Crypto from "expo-crypto";
+import { IFields } from "../../types";
 
 const DataModelScreen = () => {
   const [inputs, setInputs] = useState<Record<string, string>>({});
   const [outputs, setOutputs] = useState<Record<string, string>>({});
   const { model } = useContext(ModelContext);
 
+  /**
+   * This function updates the state of inputs by setting a new value for a specific key.
+   * @param {string} key - a string representing the key of the input field being updated
+   * @param {string} value - The value parameter is a string representing the new value that will be
+   * assigned to the specified key in the inputs object.
+   */
   const handleInput = (key: string, value: string) => {
     setInputs({ ...inputs, [key]: value });
   };
 
-  const handleSubmit = () => {
-    // perform tasks defined by the data model and display any outputs
-    const output = calculateOutput(model?.fields, inputs);
-    console.log(output);
+  /**
+   * This function handles the submission of inputs and calculates the output using a model's fields.
+   */
+  const handleSubmit = async () => {
+    const output = await calculateOutput(model?.fields, inputs);
     setOutputs(output);
   };
 
@@ -32,6 +40,7 @@ const DataModelScreen = () => {
         {model ? (
           <>
             <Text style={{ fontSize: 20, marginBottom: 30 }}>{model.name}</Text>
+            {/* maps through the fields of the model and renders the ones that are not readonly*/}
             {Object.entries(model.fields)
               .filter((field) => !field[1].readOnly)
               .map(([key, field]) => (
@@ -64,6 +73,7 @@ const DataModelScreen = () => {
                   />
                 </View>
               ))}
+            {/* maps through the outputs of the calculation*/}
             {Object.keys(outputs).length !== 0 &&
               Object.keys(outputs).map((output, index) => (
                 <View
@@ -102,30 +112,37 @@ const DataModelScreen = () => {
 
 export default DataModelScreen;
 
-const calculateOutput = (
-  fields: Record<string, Record<string, any>> | undefined,
+/**
+ * calculates output based on input fields and their properties.
+ * @param {Record<string, IFields> | undefined} fields - an object containing information about the
+ * field, such as its type, label, and validation rules.
+ * @param inputs - An object containing input values for the calculation. 
+ * @returns an object containing the calculated output values
+ */
+const calculateOutput = async (
+  fields: Record<string, IFields> | undefined,
   inputs: { [x: string]: any },
 ) => {
   const output: Record<string, any> = {};
   if (fields) {
-    Object.entries(fields).forEach(async ([key, field]) => {
+    for (const [key, field] of Object.entries(fields)) {
       if (field.readOnly && field.calculate) {
         const expression = field.calculate.replace(
           /(\w+)/g,
           (match: string | number) => inputs[match] || match,
         );
-        console.log(expression);
-        output[key] = eval(expression);
         if (key === "hash") {
-          const inputString = output[key];
-          const result = await Crypto.digestStringAsync(
+          const salt = eval(expression);
+          const hash = await Crypto.digestStringAsync(
             Crypto.CryptoDigestAlgorithm.SHA256,
-            inputString,
+            salt,
           );
-          console.log(String(result));
+          output[key] = String(hash);
+        } else {
+          output[key] = eval(expression);
         }
       }
-    });
+    }
   }
   return output;
 };
