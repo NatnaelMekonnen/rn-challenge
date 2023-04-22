@@ -1,6 +1,9 @@
 import React, { useContext, useState } from "react";
 import { View, Text, TextInput, Button } from "react-native";
 import { ModelContext } from "../../core/ModelProvider";
+import { ScrollView } from "react-native-gesture-handler";
+import { SafeAreaView } from "react-native-safe-area-context";
+import * as Crypto from "expo-crypto";
 
 const DataModelScreen = () => {
   const [inputs, setInputs] = useState<Record<string, string>>({});
@@ -19,72 +22,81 @@ const DataModelScreen = () => {
   };
 
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      {model ? (
-        <>
-          <Text style={{ fontSize: 20, marginBottom: 30 }}>{model.name}</Text>
-          {Object.entries(model.fields)
-            .filter((field) => !field[1].readOnly)
-            .map(([key, field]) => (
-              <View
-                key={key}
-                style={{
-                  marginBottom: 20,
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 2,
-                  justifyContent: "space-between",
-                  width: 220,
-                }}
-              >
-                <Text style={{ fontSize: 16 }}>{field.label}</Text>
-                <TextInput
+    <ScrollView>
+      <SafeAreaView
+        style={{
+          flex: 1,
+          alignItems: "center",
+        }}
+      >
+        {model ? (
+          <>
+            <Text style={{ fontSize: 20, marginBottom: 30 }}>{model.name}</Text>
+            {Object.entries(model.fields)
+              .filter((field) => !field[1].readOnly)
+              .map(([key, field]) => (
+                <View
+                  key={key}
                   style={{
-                    height: 40,
-                    width: 180,
-                    borderColor: "gray",
-                    borderWidth: 1,
-                    borderRadius: 5,
-                  }}
-                  editable={!field.readOnly}
-                  keyboardType={field.type === "int" ? "numeric" : "default"}
-                  value={inputs[key] ?? ""}
-                  onChangeText={(value) => handleInput(key, value)}
-                />
-              </View>
-            ))}
-          {Object.keys(outputs).length !== 0 &&
-            Object.keys(outputs).map((output, index) => (
-              <View
-                key={index}
-                style={{
-                  marginTop: 16,
-                }}
-              >
-                <Text
-                  style={{
-                    fontWeight: "bold",
-                    marginBottom: 8,
+                    marginBottom: 20,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 10,
+                    justifyContent: "space-between",
+                    width: 300,
                   }}
                 >
-                  {model.fields[output].label}
-                </Text>
-                <Text
+                  <Text style={{ fontSize: 16 }}>{field.label}</Text>
+                  <TextInput
+                    style={{
+                      height: 40,
+                      width: 240,
+                      borderColor: "gray",
+                      borderWidth: 1,
+                      borderRadius: 5,
+                    }}
+                    editable={!field.readOnly}
+                    keyboardType={
+                      field.type === "number" ? "numeric" : "default"
+                    }
+                    value={inputs[key] ?? ""}
+                    onChangeText={(value) => handleInput(key, value)}
+                  />
+                </View>
+              ))}
+            {Object.keys(outputs).length !== 0 &&
+              Object.keys(outputs).map((output, index) => (
+                <View
+                  key={index}
                   style={{
-                    fontSize: 18,
+                    marginTop: 16,
                   }}
                 >
-                  {outputs[output]}
-                </Text>
-              </View>
-            ))}
-        </>
-      ) : (
-        <Text>Model is Null</Text>
-      )}
+                  <Text
+                    style={{
+                      fontWeight: "bold",
+                      marginBottom: 8,
+                    }}
+                  >
+                    {model.fields[output].label}
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 18,
+                    }}
+                  >
+                    {outputs[output]}
+                  </Text>
+                </View>
+              ))}
+          </>
+        ) : (
+          <Text>Model is Null</Text>
+        )}
 
-      <Button title="Submit" onPress={handleSubmit} />
-    </View>
+        <Button title="Submit" onPress={handleSubmit} />
+      </SafeAreaView>
+    </ScrollView>
   );
 };
 
@@ -96,7 +108,7 @@ const calculateOutput = (
 ) => {
   const output: Record<string, any> = {};
   if (fields) {
-    Object.entries(fields).forEach(([key, field]) => {
+    Object.entries(fields).forEach(async ([key, field]) => {
       if (field.readOnly && field.calculate) {
         const expression = field.calculate.replace(
           /(\w+)/g,
@@ -104,6 +116,14 @@ const calculateOutput = (
         );
         console.log(expression);
         output[key] = eval(expression);
+        if (key === "hash") {
+          const inputString = output[key];
+          const result = await Crypto.digestStringAsync(
+            Crypto.CryptoDigestAlgorithm.SHA256,
+            inputString,
+          );
+          console.log(String(result));
+        }
       }
     });
   }

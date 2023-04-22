@@ -13,12 +13,11 @@
       "readOnly": false,
       "calculate": null
     },
-
     "hash": {
       "label": "SHA256 Hash",
       "type": "string",
       "readOnly": true,
-      "calculate": "(() => {return crypto.createHash('sha256').update('string1' + 'string2').digest('hex')})();"
+      "calculate": "(() => {const salt = String(Math.random() * 1000000000000000000).substring(0, 16); const inputString = 'string1' + 'string2' + salt; return inputString})()"
     }
   }
 }

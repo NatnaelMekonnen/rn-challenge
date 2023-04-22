@@ -18,6 +18,7 @@ const ModelSelectionScreen = (): JSX.Element => {
     //@ts-ignore
     navigation.navigate("modelDisplay");
   };
+  
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <Text style={{ fontSize: 20, marginBottom: 30 }}>
@@ -26,10 +27,9 @@ const ModelSelectionScreen = (): JSX.Element => {
       <Picker
         selectedValue={selectedModel?.name}
         style={{ height: 50, width: 200 }}
-        onValueChange={(itemValue, index) =>
+        onValueChange={(_itemValue, index) =>
           setSelectedModel(availableModels[index])
         }
-        
       >
         {availableModels?.map((model, index) => (
           <Picker.Item key={index} label={model.name} value={model.name} />

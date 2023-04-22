@@ -3,19 +3,19 @@
   "fields": {
     "x": {
       "label": "X",
-      "type": "int",
+      "type": "number",
       "readOnly": false,
       "calculate": null
     },
     "y": {
       "label": "Y",
-      "type": "int",
+      "type": "number",
       "readOnly": false,
       "calculate": null
     },
     "sum": {
       "label": "Sum",
-      "type": "int",
+      "type": "number",
       "readOnly": true,
       "calculate": "x + y"
     }
