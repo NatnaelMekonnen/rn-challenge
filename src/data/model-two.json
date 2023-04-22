@@ -1,0 +1,24 @@
+{
+  "name": "SHA256 Hash",
+  "fields": {
+    "string1": {
+      "label": "String 1",
+      "type": "string",
+      "readOnly": false,
+      "calculate": null
+    },
+    "string2": {
+      "label": "String 2",
+      "type": "string",
+      "readOnly": false,
+      "calculate": null
+    },
+
+    "hash": {
+      "label": "SHA256 Hash",
+      "type": "string",
+      "readOnly": true,
+      "calculate": "(() => {return crypto.createHash('sha256').update('string1' + 'string2').digest('hex')})();"
+    }
+  }
+}

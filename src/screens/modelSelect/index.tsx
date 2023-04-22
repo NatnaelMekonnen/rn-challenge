@@ -29,9 +29,10 @@ const ModelSelectionScreen = (): JSX.Element => {
         onValueChange={(itemValue, index) =>
           setSelectedModel(availableModels[index])
         }
+        
       >
         {availableModels?.map((model, index) => (
-          <Picker.Item key={index} label={model.name} value={model} />
+          <Picker.Item key={index} label={model.name} value={model.name} />
         ))}
       </Picker>
       <Button title="Select" onPress={handleSelectModel} />
