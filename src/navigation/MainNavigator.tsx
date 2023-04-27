@@ -38,10 +38,8 @@ export const MainNavigator = () => {
       }}
       initialRouteName="modelSelect"
     >
-      {/*Screen for selecting which model to load*/}
-      <Stack.Screen name="modelSelect" component={ModelSelectionScreen} />{" "}
-      {/*Screen which is rendered according to the model*/}
-      <Stack.Screen name="modelDisplay" component={DataModelScreen} />{" "}
+      <Stack.Screen name="modelSelect" component={ModelSelectionScreen} />
+      <Stack.Screen name="modelDisplay" component={DataModelScreen} />
     </Stack.Navigator>
   );
 };

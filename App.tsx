@@ -8,10 +8,10 @@ import * as SplashScreen from "expo-splash-screen";
 SplashScreen.preventAutoHideAsync();
 export default function App() {
   return (
-    <ModelProvider> {/*provides the model thats selected to the screens*/}
+    <ModelProvider> 
       <SafeAreaProvider>
         <NavigationContainer>
-          <MainNavigator />{/*This contains all the screens with navigation*/}
+          <MainNavigator />
         </NavigationContainer>
       </SafeAreaProvider>
     </ModelProvider>
